@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QUARK — The Core of Excellence</title>
+<meta name="description" content="Quark Technologies — Yerel verinin otonom gücü. Kuantum simülasyon, Hebbian öğrenme ve seyrek nöral mimari ile inşa edilmiş çekirdek zekâ." />
+
+<meta property="og:title" content="QUARK — The Core of Excellence" />
+<meta property="og:description" content="Yerel verinin otonom gücü. Çekirdek zekâ mimarisi." />
+<meta property="og:type" content="website" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&family=Geist:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #06080a;
+    --bg-elev: #0c1014;
+    --ink: #e8eef2;
+    --ink-dim: #6b7681;
+    --ink-mute: #3a434d;
+    --line: #1a2128;
+    --line-bright: #2a333d;
+    --cyan: #00f0ff;
+    --neon: #b8ff3a;
+    --grain-opacity: 0.04;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Geist', sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    overflow-x: hidden;
+    cursor: default;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* DOT PARTICLE FIELD */
+  .dot-field {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(184,255,58,0.18) 1px, transparent 0),
+      radial-gradient(circle at 1px 1px, rgba(0,240,255,0.08) 1px, transparent 0);
+    background-size: 32px 32px, 64px 64px;
+    background-position: 0 0, 16px 16px;
+    mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 75%);
+  }
+
+  .floating-dots {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .floating-dots span {
+    position: absolute;
+    width: 3px; height: 3px;
+    background: var(--neon);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--neon);
+    opacity: 0.5;
+    animation: float 12s linear infinite;
+  }
+  .floating-dots span:nth-child(2n) {
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+    width: 2px; height: 2px;
+  }
+  .floating-dots span:nth-child(3n) { animation-duration: 18s; opacity: 0.3; }
+  .floating-dots span:nth-child(5n) { width: 1px; height: 1px; box-shadow: none; }
+
+  @keyframes float {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-10vh) translateX(40px); opacity: 0; }
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 9999;
+    opacity: var(--grain-opacity);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    mix-blend-mode: overlay;
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 9998;
+    background: repeating-linear-gradient(0deg, rgba(0,240,255,0.015) 0px, rgba(0,240,255,0.015) 1px, transparent 1px, transparent 3px);
+  }
+  ::selection { background: var(--neon); color: var(--bg); }
+
+  nav, section, .marquee, .stats, footer { position: relative; z-index: 2; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 1.25rem 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(6,8,10,0.6);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-logo {
+    font-weight: 800; font-size: 1.1rem; letter-spacing: 0.18em;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .nav-logo-atom {
+    width: 22px; height: 22px; position: relative;
+  }
+  .nav-logo-atom::before, .nav-logo-atom::after {
+    content: ''; position: absolute; inset: 0;
+    border: 1px solid var(--neon); border-radius: 50%;
+    transform: scaleX(0.4);
+  }
+  .nav-logo-atom::after { transform: scaleX(0.4) rotate(60deg); }
+  .nav-logo-atom span {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 5px; height: 5px;
+    background: var(--neon); border-radius: 50%;
+    box-shadow: 0 0 8px var(--neon);
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    color: var(--ink-dim); text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.1em;
+    text-transform: uppercase; transition: color 0.2s ease;
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-links a::before { content: '['; color: var(--ink-mute); margin-right: 4px; transition: color 0.2s; }
+  .nav-links a::after { content: ']'; color: var(--ink-mute); margin-left: 4px; transition: color 0.2s; }
+  .nav-links a:hover::before, .nav-links a:hover::after { color: var(--neon); }
+  .nav-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--ink-dim);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    background: var(--neon); border-radius: 50%;
+    box-shadow: 0 0 8px var(--neon);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    padding: 8rem 2rem 4rem;
+    max-width: 1400px; margin: 0 auto;
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    opacity: 0.4; pointer-events: none;
+  }
+  .hero-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; color: var(--ink-dim);
+    letter-spacing: 0.15em; margin-bottom: 2rem;
+    display: flex; align-items: center; gap: 1rem;
+    opacity: 0; animation: fadeUp 0.8s ease forwards;
+  }
+  .hero-meta::before {
+    content: ''; width: 30px; height: 1px; background: var(--neon);
+  }
+  .hero h1 {
+    font-weight: 800;
+    font-size: clamp(3.5rem, 9vw, 8.5rem);
+    line-height: 0.9; letter-spacing: -0.04em;
+    margin-bottom: 2rem;
+    opacity: 0; animation: fadeUp 0.9s 0.15s ease forwards;
+  }
+  .hero h1 .italic {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic; font-weight: 400;
+    color: var(--neon); letter-spacing: -0.02em;
+  }
+  .hero-sub {
+    max-width: 580px; font-size: 1.1rem;
+    color: var(--ink-dim); line-height: 1.6;
+    margin-bottom: 3rem;
+    opacity: 0; animation: fadeUp 0.9s 0.3s ease forwards;
+  }
+  .hero-cta {
+    display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+    opacity: 0; animation: fadeUp 0.9s 0.45s ease forwards;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    padding: 1rem 1.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem; letter-spacing: 0.1em;
+    text-transform: uppercase; text-decoration: none;
+    border: 1px solid var(--line-bright);
+    color: var(--ink); background: transparent;
+    cursor: pointer; transition: all 0.25s ease;
+    position: relative; overflow: hidden;
+  }
+  .btn-primary {
+    background: var(--neon); color: var(--bg); border-color: var(--neon);
+  }
+  .btn-primary:hover {
+    background: transparent; color: var(--neon);
+    box-shadow: 0 0 24px rgba(184,255,58,0.4);
+  }
+  .btn:hover { border-color: var(--neon); color: var(--neon); }
+  .btn-arrow { display: inline-block; transition: transform 0.2s; }
+  .btn:hover .btn-arrow { transform: translateX(4px); }
+
+  .hero-visual {
+    position: absolute; right: 4rem; top: 50%;
+    transform: translateY(-50%);
+    width: 440px; height: 440px;
+    pointer-events: none;
+    opacity: 0; animation: fadeIn 1.5s 0.6s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  /* MARQUEE */
+  .marquee {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    overflow: hidden; padding: 1.25rem 0;
+    background: var(--bg-elev);
+  }
+  .marquee-track {
+    display: flex; gap: 4rem;
+    animation: scroll 30s linear infinite;
+    white-space: nowrap;
+  }
+  .marquee-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem; color: var(--ink-dim);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .marquee-item .dot {
+    width: 4px; height: 4px;
+    background: var(--neon); border-radius: 50%;
+    box-shadow: 0 0 6px var(--neon);
+  }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+
+  /* SECTIONS */
+  section { padding: 8rem 2rem; max-width: 1400px; margin: 0 auto; }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--ink-dim);
+    letter-spacing: 0.2em; text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .section-label::before {
+    content: ''; width: 8px; height: 8px;
+    background: var(--neon); border-radius: 50%;
+    box-shadow: 0 0 10px var(--neon);
+  }
+  .section-title {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 700; line-height: 1; letter-spacing: -0.03em;
+    margin-bottom: 4rem; max-width: 900px;
+  }
+  .section-title .italic {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic; font-weight: 400; color: var(--neon);
+  }
+
+  /* Q1 SHOWCASE */
+  .q1-showcase {
+    display: grid; grid-template-columns: 1fr 1.2fr;
+    gap: 4rem; align-items: center;
+  }
+  .q1-text .badge {
+    display: inline-block; padding: 0.4rem 0.8rem;
+    border: 1px solid var(--neon); color: var(--neon);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; letter-spacing: 0.15em;
+    margin-bottom: 1.5rem; background: rgba(184,255,58,0.05);
+  }
+  .q1-text h3 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700; line-height: 1.05; letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+  }
+  .q1-text h3 .italic {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic; font-weight: 400; color: var(--cyan);
+  }
+  .q1-text p {
+    color: var(--ink-dim); font-size: 1.05rem;
+    line-height: 1.7; margin-bottom: 2rem; max-width: 480px;
+  }
+  .q1-features {
+    display: flex; flex-direction: column;
+    gap: 1rem; margin-bottom: 2.5rem;
+  }
+  .q1-feature {
+    display: flex; align-items: flex-start; gap: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem; color: var(--ink);
+  }
+  .q1-feature::before { content: '▸'; color: var(--neon); flex-shrink: 0; }
+
+  .terminal {
+    background: linear-gradient(135deg, rgba(12,16,20,0.9), rgba(6,8,10,0.9));
+    border: 1px solid var(--line-bright); border-radius: 8px;
+    overflow: hidden; backdrop-filter: blur(10px);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 60px rgba(0,240,255,0.05);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .terminal-header {
+    background: var(--bg-elev); border-bottom: 1px solid var(--line);
+    padding: 0.85rem 1.25rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .terminal-controls { display: flex; gap: 0.5rem; }
+  .terminal-controls span {
+    width: 11px; height: 11px;
+    border-radius: 50%; background: var(--ink-mute);
+  }
+  .terminal-title { font-size: 0.7rem; color: var(--ink-dim); letter-spacing: 0.05em; }
+  .terminal-body { padding: 1.5rem; font-size: 0.82rem; line-height: 1.7; min-height: 320px; }
+  .term-line { display: block; margin-bottom: 0.5rem; }
+  .term-prompt { color: var(--neon); }
+  .term-cyan { color: var(--cyan); }
+  .term-dim { color: var(--ink-dim); }
+  .term-cursor {
+    display: inline-block; width: 8px; height: 1em;
+    background: var(--neon); vertical-align: text-bottom;
+    animation: blink 1s steps(2) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .term-bar {
+    display: inline-block; height: 8px; width: 200px;
+    background: var(--line); border-radius: 2px;
+    margin-left: 0.5rem; position: relative;
+    vertical-align: middle; overflow: hidden;
+  }
+  .term-bar::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, var(--cyan), var(--neon));
+    width: 87%; box-shadow: 0 0 10px var(--neon);
+  }
+  .term-meta {
+    display: flex; gap: 1.5rem;
+    margin-top: 1rem; padding-top: 1rem;
+    border-top: 1px dashed var(--line-bright);
+    font-size: 0.7rem; color: var(--ink-dim);
+  }
+  .term-meta span strong { color: var(--cyan); font-weight: 500; }
+
+  /* TECH GRID with ATOMIC MODELS */
+  .tech-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--line); border: 1px solid var(--line);
+  }
+  .tech-cell {
+    background: var(--bg); padding: 2.5rem 2rem;
+    min-height: 320px; position: relative;
+    transition: background 0.3s ease; cursor: default; overflow: hidden;
+  }
+  .tech-cell:hover { background: var(--bg-elev); }
+  .tech-cell:hover .tech-num { color: var(--neon); }
+  .tech-cell:hover .atom-icon { transform: scale(1.1); }
+  .tech-cell:hover .atom-icon ellipse, .tech-cell:hover .atom-icon circle.orbit-ring { stroke: var(--neon); }
+
+  .tech-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--ink-mute);
+    letter-spacing: 0.15em; margin-bottom: 1.5rem;
+    transition: color 0.3s;
+  }
+  .atom-icon {
+    width: 60px; height: 60px;
+    margin-bottom: 1.5rem; transition: transform 0.4s ease;
+  }
+  .atom-icon ellipse, .atom-icon circle.orbit-ring { transition: stroke 0.3s ease; }
+  .tech-cell h4 {
+    font-size: 1.4rem; font-weight: 600;
+    letter-spacing: -0.02em; margin-bottom: 1rem; line-height: 1.1;
+  }
+  .tech-cell h4 .italic {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic; font-weight: 400; color: var(--neon);
+  }
+  .tech-cell p { color: var(--ink-dim); font-size: 0.9rem; line-height: 1.6; }
+  .tech-cell .corner {
+    position: absolute; top: 1rem; right: 1rem;
+    width: 12px; height: 12px;
+    border-top: 1px solid var(--line-bright);
+    border-right: 1px solid var(--line-bright);
+  }
+  .tech-cell .deco-dots {
+    position: absolute; bottom: 1rem; right: 1rem;
+    display: grid; grid-template-columns: repeat(4, 4px);
+    gap: 4px; opacity: 0.3;
+  }
+  .tech-cell .deco-dots span {
+    width: 4px; height: 4px;
+    background: var(--ink-mute); border-radius: 50%;
+  }
+  .tech-cell .deco-dots span:nth-child(3n) { background: var(--neon); }
+
+  /* PARALLELISM */
+  .parallelism {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 4rem; align-items: center;
+    padding: 8rem 2rem; max-width: 1400px; margin: 0 auto;
+    border-top: 1px solid var(--line);
+    position: relative; z-index: 2;
+  }
+  .parallelism h2 {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 700; line-height: 1; letter-spacing: -0.03em;
+    margin-bottom: 2rem;
+  }
+  .parallelism h2 .italic {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic; font-weight: 400; color: var(--cyan);
+  }
+  .parallelism p {
+    color: var(--ink-dim); font-size: 1.05rem;
+    line-height: 1.7; max-width: 480px;
+  }
+  .parallel-visual {
+    height: 440px; position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .parallel-visual svg { width: 100%; height: 100%; }
+
+  /* STATS */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+  }
+  .stat {
+    padding: 3rem 2rem; border-right: 1px solid var(--line);
+    text-align: left; position: relative;
+  }
+  .stat:last-child { border-right: none; }
+  .stat::before {
+    content: ''; position: absolute;
+    top: 1rem; left: 1rem;
+    width: 4px; height: 4px;
+    background: var(--neon); border-radius: 50%;
+    box-shadow: 0 0 6px var(--neon);
+  }
+  .stat-value {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700; line-height: 1;
+    letter-spacing: -0.03em; margin-bottom: 0.5rem;
+  }
+  .stat-value .unit {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic; font-weight: 400;
+    color: var(--neon); font-size: 0.6em;
+  }
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--ink-dim);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  /* CTA */
+  .cta-section {
+    padding: 10rem 2rem; text-align: center;
+    border-top: 1px solid var(--line);
+    position: relative; overflow: hidden; z-index: 2;
+  }
+  .cta-section::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at center, rgba(184,255,58,0.08), transparent 60%);
+    pointer-events: none;
+  }
+  .cta-section h2 {
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 800; line-height: 0.95;
+    letter-spacing: -0.04em; margin-bottom: 2rem;
+    max-width: 1000px; margin-left: auto; margin-right: auto;
+    position: relative;
+  }
+  .cta-section h2 .italic {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic; font-weight: 400; color: var(--neon);
+  }
+  .cta-section p {
+    color: var(--ink-dim); font-size: 1.1rem;
+    margin-bottom: 3rem; position: relative;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 4rem 2rem 2rem;
+    max-width: 1400px; margin: 0 auto;
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr;
+    gap: 3rem; margin-bottom: 4rem; align-items: start;
+  }
+  .footer-brand-wrap { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+  .footer-brand { font-size: 2rem; font-weight: 800; letter-spacing: 0.08em; }
+  .footer-tag {
+    color: var(--ink-dim); font-size: 0.9rem;
+    line-height: 1.6; max-width: 380px;
+  }
+  .footer-col h5 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--ink-mute);
+    letter-spacing: 0.15em; text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 0.75rem; }
+  .footer-col a {
+    color: var(--ink-dim); text-decoration: none;
+    font-size: 0.9rem; transition: color 0.2s;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .footer-col a:hover { color: var(--neon); }
+  .footer-bottom {
+    border-top: 1px solid var(--line); padding-top: 2rem;
+    display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--ink-mute);
+    letter-spacing: 0.05em; flex-wrap: wrap; gap: 1rem;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .hero-visual { display: none; }
+    .nav-links { display: none; }
+    .q1-showcase, .parallelism { grid-template-columns: 1fr; gap: 3rem; }
+    .tech-grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(2) { border-right: none; }
+    .footer-grid { grid-template-columns: 1fr; }
+    section { padding: 5rem 1.5rem; }
+    .hero { padding: 7rem 1.5rem 3rem; }
+    nav { padding: 1rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="dot-field"></div>
+<div class="floating-dots" id="floatingDots"></div>
+
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-atom"><span></span></div>
+    QUARK
+  </div>
+  <ul class="nav-links">
+    <li><a href="#q1">Q1</a></li>
+    <li><a href="#tech">Tech</a></li>
+    <li><a href="#parallelism">Parallelism</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-status">
+    <span class="status-dot"></span>
+    <span>SYS://ONLINE</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-meta">QUARK TECHNOLOGIES CORE / V.6.0 / 2026</div>
+  <h1>The core of<br><span class="italic">excellence.</span></h1>
+  <p class="hero-sub">Yerel verinin otonom gücü. Hebbian öğrenme, kuantum simülasyon ve seyrek nöral mimari ile inşa edilmiş bir çekirdek zekâ katmanı — bulut bağımlılığı sıfır.</p>
+  <div class="hero-cta">
+    <a href="#q1" class="btn btn-primary">Quark Q1'i Keşfet <span class="btn-arrow">→</span></a>
+    <a href="#tech" class="btn">Mimari <span class="btn-arrow">↓</span></a>
+  </div>
+
+  <!-- HERO ATOMIC MODEL -->
+  <div class="hero-visual">
+    <svg viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="nucGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#b8ff3a" stop-opacity="0.9"/>
+          <stop offset="30%" stop-color="#1a1a1a"/>
+          <stop offset="100%" stop-color="#000"/>
+        </radialGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <g opacity="0.4">
+        <circle cx="50" cy="80" r="1.5" fill="#b8ff3a"/>
+        <circle cx="380" cy="60" r="1" fill="#00f0ff"/>
+        <circle cx="400" cy="350" r="1.5" fill="#b8ff3a"/>
+        <circle cx="60" cy="380" r="1" fill="#00f0ff"/>
+        <circle cx="220" cy="40" r="1" fill="#b8ff3a"/>
+        <circle cx="30" cy="220" r="1" fill="#00f0ff"/>
+        <circle cx="410" cy="220" r="1.5" fill="#b8ff3a"/>
+        <circle cx="220" cy="410" r="1" fill="#00f0ff"/>
+      </g>
+
+      <ellipse cx="220" cy="220" rx="180" ry="70" fill="none" stroke="#2a333d" stroke-width="1">
+        <animateTransform attributeName="transform" type="rotate" from="0 220 220" to="360 220 220" dur="22s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="220" cy="220" rx="180" ry="70" fill="none" stroke="#1a2128" stroke-width="1" transform="rotate(60 220 220)">
+        <animateTransform attributeName="transform" type="rotate" from="60 220 220" to="420 220 220" dur="28s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="220" cy="220" rx="180" ry="70" fill="none" stroke="#2a333d" stroke-width="1" transform="rotate(120 220 220)">
+        <animateTransform attributeName="transform" type="rotate" from="120 220 220" to="480 220 220" dur="34s" repeatCount="indefinite"/>
+      </ellipse>
+
+      <circle r="5" fill="#b8ff3a" filter="url(#glow)">
+        <animateMotion dur="22s" repeatCount="indefinite" path="M 220 150 a 180 70 0 1 1 0 140 a 180 70 0 1 1 0 -140"/>
+      </circle>
+      <circle r="4" fill="#00f0ff" filter="url(#glow)">
+        <animateMotion dur="28s" repeatCount="indefinite" path="M 220 150 a 180 70 0 1 1 0 140 a 180 70 0 1 1 0 -140" begin="-7s"/>
+      </circle>
+      <circle r="4" fill="#b8ff3a" filter="url(#glow)">
+        <animateMotion dur="34s" repeatCount="indefinite" path="M 220 150 a 180 70 0 1 1 0 140 a 180 70 0 1 1 0 -140" begin="-14s"/>
+      </circle>
+
+      <circle cx="220" cy="220" r="32" fill="url(#nucGrad)"/>
+      <circle cx="220" cy="220" r="40" fill="none" stroke="#b8ff3a" stroke-width="0.5" stroke-dasharray="2 4" opacity="0.6">
+        <animateTransform attributeName="transform" type="rotate" from="0 220 220" to="360 220 220" dur="10s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="220" cy="220" r="48" fill="none" stroke="#00f0ff" stroke-width="0.3" opacity="0.3"/>
+    </svg>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span class="marquee-item">QUARK KERNEL <span class="dot"></span></span>
+    <span class="marquee-item">SPARSE SPIKE ENGINE <span class="dot"></span></span>
+    <span class="marquee-item">HEBBIAN LEARNING <span class="dot"></span></span>
+    <span class="marquee-item">MULTIVERSAL DATA SYNC <span class="dot"></span></span>
+    <span class="marquee-item">QUARK PARALLELISM <span class="dot"></span></span>
+    <span class="marquee-item">ZERO-CLOUD INFERENCE <span class="dot"></span></span>
+    <span class="marquee-item">QUARK Q1 / RAG <span class="dot"></span></span>
+    <span class="marquee-item">QUARK KERNEL <span class="dot"></span></span>
+    <span class="marquee-item">SPARSE SPIKE ENGINE <span class="dot"></span></span>
+    <span class="marquee-item">HEBBIAN LEARNING <span class="dot"></span></span>
+    <span class="marquee-item">MULTIVERSAL DATA SYNC <span class="dot"></span></span>
+    <span class="marquee-item">QUARK PARALLELISM <span class="dot"></span></span>
+    <span class="marquee-item">ZERO-CLOUD INFERENCE <span class="dot"></span></span>
+    <span class="marquee-item">QUARK Q1 / RAG <span class="dot"></span></span>
+  </div>
+</div>
+
+<!-- Q1 -->
+<section id="q1">
+  <div class="section-label">Flagship / 01</div>
+  <h2 class="section-title">Quark Q1 — yerel verinin <span class="italic">otonom gücü.</span></h2>
+  <div class="q1-showcase">
+    <div class="q1-text">
+      <span class="badge">RAG · DOCUMENT INTELLIGENCE</span>
+      <h3>Belgelerin <span class="italic">düşünmeye</span> başladığı an.</h3>
+      <p>Phi-3 motoru ve ChromaDB üzerinde çalışan, sürükle-bırak basitliğinde profesyonel bir doküman analiz platformu. Veriniz sizinle kalır — bulut yok, sızıntı yok.</p>
+      <div class="q1-features">
+        <div class="q1-feature">PDF · DOCX · TXT yerel ingestor</div>
+        <div class="q1-feature">Vektör embed · ChromaDB indeksleme</div>
+        <div class="q1-feature">Phi-3 yerel inference motoru</div>
+        <div class="q1-feature">Token & latency telemetrisi</div>
+      </div>
+      <a href="https://github.com/KARUB58/Quark-Q1" target="_blank" rel="noopener" class="btn btn-primary">GitHub'da Gör <span class="btn-arrow">→</span></a>
+    </div>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="terminal-controls"><span></span><span></span><span></span></div>
+        <div class="terminal-title">quark-q1 // session.0x4a2f</div>
+      </div>
+      <div class="terminal-body">
+        <span class="term-line"><span class="term-prompt">▸ ingest</span> <span class="term-dim">--file</span> <span class="term-cyan">"contract_v3.pdf"</span></span>
+        <span class="term-line"><span class="term-dim">  → parsing... 142 chunks · 384-dim embeds</span></span>
+        <span class="term-line"><span class="term-dim">  → indexing</span><span class="term-bar"></span> <span class="term-cyan">87%</span></span>
+        <span class="term-line"><span class="term-prompt">▸ query</span> <span class="term-cyan">"fesih şartları nelerdir?"</span></span>
+        <span class="term-line"><span class="term-dim">  retrieving k=5 · cosine 0.87...</span></span>
+        <span class="term-line" style="color:var(--ink); margin-top:0.75rem;">Madde 14.2 uyarınca, taraflardan herhangi biri 30 gün önceden yazılı bildirimde bulunarak sözleşmeyi tek taraflı feshedebilir<span class="term-cursor"></span></span>
+        <div class="term-meta">
+          <span><strong>247ms</strong> latency</span>
+          <span><strong>1.2k</strong> tokens</span>
+          <span><strong>local</strong> · phi-3</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-value">+40<span class="unit">%</span></div><div class="stat-label">Throughput Gain</div></div>
+  <div class="stat"><div class="stat-value">0<span class="unit">ms</span></div><div class="stat-label">Cloud Roundtrip</div></div>
+  <div class="stat"><div class="stat-value">15<span class="unit">+</span></div><div class="stat-label">Bio Principles</div></div>
+  <div class="stat"><div class="stat-value">100<span class="unit">%</span></div><div class="stat-label">On-Device</div></div>
+</div>
+
+<!-- TECH -->
+<section id="tech">
+  <div class="section-label">Teknolojiler / Stack</div>
+  <h2 class="section-title">Çekirdekten <span class="italic">başlayan</span> mimari.</h2>
+
+  <div class="tech-grid">
+
+    <div class="tech-cell">
+      <span class="corner"></span>
+      <div class="tech-num">// 01</div>
+      <svg class="atom-icon" viewBox="0 0 60 60">
+        <ellipse cx="30" cy="30" rx="26" ry="10" fill="none" stroke="#2a333d" stroke-width="1"/>
+        <ellipse cx="30" cy="30" rx="26" ry="10" fill="none" stroke="#2a333d" stroke-width="1" transform="rotate(60 30 30)"/>
+        <ellipse cx="30" cy="30" rx="26" ry="10" fill="none" stroke="#2a333d" stroke-width="1" transform="rotate(120 30 30)"/>
+        <circle cx="30" cy="30" r="4" fill="#b8ff3a"/>
+        <circle cx="56" cy="30" r="2" fill="#b8ff3a"/>
+        <circle cx="17" cy="52.5" r="2" fill="#00f0ff"/>
+        <circle cx="17" cy="7.5" r="2" fill="#b8ff3a"/>
+      </svg>
+      <h4>Kernel <span class="italic">Intelligence</span></h4>
+      <p>Kod olasılıklarını kuantum düzeyinde sentezleyen, trilyonlarca veriyi saniyeler içinde işleyen derin öğrenme motoru.</p>
+      <div class="deco-dots"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="tech-cell">
+      <span class="corner"></span>
+      <div class="tech-num">// 02</div>
+      <svg class="atom-icon" viewBox="0 0 60 60">
+        <ellipse cx="30" cy="30" rx="26" ry="6" fill="none" stroke="#2a333d" stroke-width="1"/>
+        <ellipse cx="30" cy="30" rx="26" ry="14" fill="none" stroke="#2a333d" stroke-width="1"/>
+        <ellipse cx="30" cy="30" rx="26" ry="22" fill="none" stroke="#2a333d" stroke-width="1"/>
+        <circle cx="30" cy="30" r="3" fill="#b8ff3a"/>
+        <circle cx="56" cy="30" r="2" fill="#00f0ff"/>
+        <circle cx="4" cy="30" r="2" fill="#00f0ff"/>
+        <circle cx="30" cy="8" r="1.5" fill="#b8ff3a"/>
+        <circle cx="30" cy="52" r="1.5" fill="#b8ff3a"/>
+      </svg>
+      <h4>Multiversal <span class="italic">Data Sync</span></h4>
+      <p>Sistem çapında algoritmik verimliliği %40'ın üzerinde artıran, gecikmeyi minimuma indiren paralel veri akış motoru.</p>
+      <div class="deco-dots"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="tech-cell">
+      <span class="corner"></span>
+      <div class="tech-num">// 03</div>
+      <svg class="atom-icon" viewBox="0 0 60 60">
+        <line x1="30" y1="30" x2="10" y2="10" stroke="#2a333d" stroke-width="0.5"/>
+        <line x1="30" y1="30" x2="50" y2="10" stroke="#2a333d" stroke-width="0.5"/>
+        <line x1="30" y1="30" x2="10" y2="50" stroke="#2a333d" stroke-width="0.5"/>
+        <line x1="30" y1="30" x2="50" y2="50" stroke="#2a333d" stroke-width="0.5"/>
+        <line x1="30" y1="30" x2="30" y2="6" stroke="#b8ff3a" stroke-width="0.8"/>
+        <line x1="30" y1="30" x2="54" y2="30" stroke="#b8ff3a" stroke-width="0.8"/>
+        <circle cx="30" cy="30" r="4" fill="#b8ff3a"/>
+        <circle cx="10" cy="10" r="2" fill="#2a333d"/>
+        <circle cx="50" cy="10" r="2" fill="#2a333d"/>
+        <circle cx="10" cy="50" r="2" fill="#2a333d"/>
+        <circle cx="50" cy="50" r="2" fill="#2a333d"/>
+        <circle cx="30" cy="6" r="2.5" fill="#b8ff3a"/>
+        <circle cx="54" cy="30" r="2.5" fill="#b8ff3a"/>
+        <circle cx="30" cy="54" r="2" fill="#00f0ff"/>
+        <circle cx="6" cy="30" r="2" fill="#00f0ff"/>
+      </svg>
+      <h4>Hebbian <span class="italic">Learning</span></h4>
+      <p>Yazılan her satır kod ile sinaptik bağları güçlendirerek kendini geliştiren, biyolojik kurallara dayalı otonom motor.</p>
+      <div class="deco-dots"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="tech-cell">
+      <span class="corner"></span>
+      <div class="tech-num">// 04</div>
+      <svg class="atom-icon" viewBox="0 0 60 60">
+        <circle class="orbit-ring" cx="30" cy="30" r="20" fill="none" stroke="#2a333d" stroke-width="0.5" stroke-dasharray="2 3"/>
+        <circle cx="10" cy="10" r="1.5" fill="#b8ff3a"/>
+        <circle cx="50" cy="10" r="1.5" fill="#2a333d"/>
+        <circle cx="50" cy="50" r="1.5" fill="#b8ff3a"/>
+        <circle cx="10" cy="50" r="1.5" fill="#2a333d"/>
+        <circle cx="30" cy="6" r="1.5" fill="#00f0ff"/>
+        <circle cx="54" cy="30" r="1.5" fill="#2a333d"/>
+        <circle cx="30" cy="54" r="1.5" fill="#b8ff3a"/>
+        <circle cx="6" cy="30" r="1.5" fill="#2a333d"/>
+        <circle cx="20" cy="20" r="1" fill="#2a333d"/>
+        <circle cx="40" cy="40" r="1" fill="#b8ff3a"/>
+        <circle cx="40" cy="20" r="1" fill="#2a333d"/>
+        <circle cx="20" cy="40" r="1" fill="#00f0ff"/>
+        <circle cx="30" cy="30" r="3.5" fill="#b8ff3a"/>
+      </svg>
+      <h4>Sparse <span class="italic">Spike Engine</span></h4>
+      <p>Minimum enerji ile maksimum bilişsel hız sunan seyrek nöral mimari. Donanım limitlerini zorlayarak verimlilik sağlar.</p>
+      <div class="deco-dots"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="tech-cell">
+      <span class="corner"></span>
+      <div class="tech-num">// 05</div>
+      <svg class="atom-icon" viewBox="0 0 60 60">
+        <circle class="orbit-ring" cx="30" cy="30" r="24" fill="none" stroke="#2a333d" stroke-width="0.5"/>
+        <circle class="orbit-ring" cx="30" cy="30" r="16" fill="none" stroke="#2a333d" stroke-width="0.5"/>
+        <circle class="orbit-ring" cx="30" cy="30" r="8" fill="none" stroke="#b8ff3a" stroke-width="0.8"/>
+        <circle cx="30" cy="30" r="3" fill="#b8ff3a"/>
+        <circle cx="38" cy="30" r="1.5" fill="#b8ff3a"/>
+        <circle cx="30" cy="14" r="1.5" fill="#00f0ff"/>
+        <circle cx="46" cy="30" r="1.5" fill="#00f0ff"/>
+        <circle cx="14" cy="42" r="1.5" fill="#b8ff3a"/>
+        <circle cx="48" cy="42" r="1.5" fill="#b8ff3a"/>
+      </svg>
+      <h4>Quark <span class="italic">Kernel</span></h4>
+      <p>Kodun en alt katmanına inerek mimariyi optimize eden, hataları daha oluşmadan engelleyen çekirdek algoritma.</p>
+      <div class="deco-dots"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="tech-cell">
+      <span class="corner"></span>
+      <div class="tech-num">// 06</div>
+      <svg class="atom-icon" viewBox="0 0 60 60">
+        <ellipse cx="30" cy="30" rx="24" ry="8" fill="none" stroke="#2a333d" stroke-width="1" transform="rotate(30 30 30)"/>
+        <ellipse cx="30" cy="30" rx="24" ry="8" fill="none" stroke="#2a333d" stroke-width="1" transform="rotate(-30 30 30)"/>
+        <ellipse cx="30" cy="30" rx="24" ry="8" fill="none" stroke="#2a333d" stroke-width="1" transform="rotate(90 30 30)"/>
+        <circle cx="30" cy="30" r="4" fill="#b8ff3a"/>
+        <circle cx="50" cy="20" r="2" fill="#b8ff3a"/>
+        <circle cx="10" cy="40" r="2" fill="#00f0ff"/>
+        <circle cx="50" cy="40" r="2" fill="#00f0ff"/>
+        <circle cx="10" cy="20" r="2" fill="#b8ff3a"/>
+        <circle cx="30" cy="6" r="1.5" fill="#b8ff3a"/>
+        <circle cx="30" cy="54" r="1.5" fill="#00f0ff"/>
+      </svg>
+      <h4>Quark <span class="italic">Control</span></h4>
+      <p>Donanım ve dijital dünyayı bağlayan otonom köprü. Geliştiricinin tarzına adapte olan bilişsel uzaktan yönetim protokolü.</p>
+      <div class="deco-dots"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PARALLELISM -->
+<div class="parallelism" id="parallelism">
+  <div>
+    <div class="section-label">Quark Parallelism</div>
+    <h2>Hatasız <span class="italic">tek senaryo,</span> binlerce paralel evren.</h2>
+    <p>Hata olasılıklarını sıfıra indiren kuantum simülasyon motoru. Bir işlem gerçekleşmeden önce, binlerce olası sonuç simüle edilir ve kusursuz olan tek senaryo ana evrene entegre edilir.</p>
+  </div>
+
+  <div class="parallel-visual">
+    <svg viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="coreGrad2" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#b8ff3a" stop-opacity="0.9"/>
+          <stop offset="40%" stop-color="#1a1a1a"/>
+          <stop offset="100%" stop-color="#000"/>
+        </radialGradient>
+      </defs>
+
+      <g opacity="0.4">
+        <circle cx="40" cy="60" r="1" fill="#b8ff3a"/>
+        <circle cx="380" cy="80" r="1.5" fill="#00f0ff"/>
+        <circle cx="60" cy="380" r="1" fill="#b8ff3a"/>
+        <circle cx="400" cy="360" r="1" fill="#00f0ff"/>
+        <circle cx="220" cy="20" r="1" fill="#b8ff3a"/>
+        <circle cx="220" cy="420" r="1" fill="#00f0ff"/>
+        <circle cx="20" cy="220" r="1" fill="#b8ff3a"/>
+        <circle cx="420" cy="220" r="1" fill="#b8ff3a"/>
+        <circle cx="100" cy="120" r="0.8" fill="#00f0ff"/>
+        <circle cx="340" cy="320" r="0.8" fill="#b8ff3a"/>
+      </g>
+
+      <ellipse cx="220" cy="220" rx="170" ry="65" fill="none" stroke="#2a333d" stroke-width="1">
+        <animateTransform attributeName="transform" type="rotate" from="0 220 220" to="360 220 220" dur="20s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="220" cy="220" rx="170" ry="65" fill="none" stroke="#1a2128" stroke-width="1" transform="rotate(45 220 220)">
+        <animateTransform attributeName="transform" type="rotate" from="45 220 220" to="405 220 220" dur="25s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="220" cy="220" rx="170" ry="65" fill="none" stroke="#2a333d" stroke-width="1" transform="rotate(90 220 220)">
+        <animateTransform attributeName="transform" type="rotate" from="90 220 220" to="450 220 220" dur="30s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="220" cy="220" rx="170" ry="65" fill="none" stroke="#1a2128" stroke-width="1" transform="rotate(135 220 220)">
+        <animateTransform attributeName="transform" type="rotate" from="135 220 220" to="495 220 220" dur="35s" repeatCount="indefinite"/>
+      </ellipse>
+
+      <circle r="4" fill="#00f0ff">
+        <animateMotion dur="20s" repeatCount="indefinite" path="M 220 155 a 170 65 0 1 1 0 130 a 170 65 0 1 1 0 -130"/>
+      </circle>
+      <circle r="3" fill="#b8ff3a">
+        <animateMotion dur="25s" repeatCount="indefinite" path="M 220 155 a 170 65 0 1 0 0 130 a 170 65 0 1 0 0 -130" begin="-5s"/>
+      </circle>
+      <circle r="3" fill="#e8eef2" opacity="0.6">
+        <animateMotion dur="30s" repeatCount="indefinite" path="M 220 155 a 170 65 0 1 1 0 130 a 170 65 0 1 1 0 -130" begin="-10s"/>
+      </circle>
+      <circle r="2.5" fill="#b8ff3a">
+        <animateMotion dur="35s" repeatCount="indefinite" path="M 220 155 a 170 65 0 1 0 0 130 a 170 65 0 1 0 0 -130" begin="-15s"/>
+      </circle>
+
+      <circle cx="220" cy="220" r="26" fill="url(#coreGrad2)"/>
+      <circle cx="220" cy="220" r="34" fill="none" stroke="#b8ff3a" stroke-width="0.5" stroke-dasharray="2 4" opacity="0.5">
+        <animateTransform attributeName="transform" type="rotate" from="0 220 220" to="360 220 220" dur="10s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+  </div>
+</div>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <h2>Çekirdeğe inmeye <span class="italic">hazır mısın?</span></h2>
+  <p>Quark Q1 erken erişim için GitHub deposunu inceleyin.</p>
+  <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+    <a href="https://github.com/KARUB58/Quark-Q1" target="_blank" rel="noopener" class="btn btn-primary">GitHub <span class="btn-arrow">↗</span></a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-wrap">
+        <div class="nav-logo-atom" style="width:28px; height:28px;"><span></span></div>
+        <div class="footer-brand">QUARK</div>
+      </div>
+      <div class="footer-tag">Quark Technologies — The core of excellence. Yerel zekâ mimarisi üzerine inşa edilmiş, otonom ve evrim geçiren bilişsel sistemler.</div>
+    </div>
+    <div class="footer-col">
+      <h5>Bağlantı</h5>
+      <ul>
+        <li><a href="https://github.com/KARUB58/Quark-Q1" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub / Quark-Q1
+        </a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 QUARK TECHNOLOGIES · BUILT BY BURAK</span>
+    <span>İSTANBUL · 41.0082°N 28.9784°E</span>
+  </div>
+</footer>
+
+<script>
+  const dotsContainer = document.getElementById('floatingDots');
+  for (let i = 0; i < 35; i++) {
+    const dot = document.createElement('span');
+    dot.style.left = Math.random() * 100 + '%';
+    dot.style.animationDelay = Math.random() * 12 + 's';
+    dot.style.animationDuration = (8 + Math.random() * 14) + 's';
+    dotsContainer.appendChild(dot);
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('section, .stats, .marquee, .parallelism').forEach(el => {
+    if (!el.classList.contains('hero')) {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+      observer.observe(el);
+    }
+  });
+</script>
+
+</body>
+</html>
